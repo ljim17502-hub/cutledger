@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review changed cuts in a video prompt before you spend time rendering. No video or upload needed.">
+  <meta name="color-scheme" content="dark">
+  <title>CutLedger · Pre-render cut review</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="core.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#inputs">Skip to inputs</a>
+  <header class="top shell"><a href="./index.html" class="brand"><span aria-hidden="true" class="mark">⫶</span> CutLedger</a><span class="local"><i></i> Runs locally</span></header>
+  <main class="shell">
+    <noscript><p>Enable JavaScript to run this local cut comparison.</p></noscript>
+    <section class="hero">
+      <p class="kicker">PRE-RENDER REVIEW / 001</p>
+      <h1>Did the cut move?</h1>
+      <p class="intro">See what a rewritten video plan changed before you hit render. Match cuts by ID and record exactly which retimes you approved.</p>
+      <button type="button" id="demo" class="secondary">Load 8-second demo <span aria-hidden="true">↺</span></button> <span class="hint" id="sample-state">Synthetic example</span>
+    </section>
+    <div class="workspace">
+      <section class="card" id="inputs" aria-labelledby="input-title">
+        <header class="card-head"><span class="step">01</span><div><h2 id="input-title">Cut plan</h2><p>One cut per line: <code>A 2.000</code></p></div></header>
+        <div class="input-body">
+          <label for="duration">Source duration</label><div class="inline"><input id="duration" inputmode="decimal" aria-describedby="duration-hint"><span id="duration-hint">seconds or mm:ss.sss</span></div>
+          <div class="fields">
+            <div><label for="source">Source cuts</label><textarea id="source" rows="4" spellcheck="false" autocapitalize="off" aria-describedby="cut-hint"></textarea></div>
+            <div><label for="proposed">Proposed cuts</label><textarea id="proposed" rows="4" spellcheck="false" autocapitalize="off" aria-describedby="cut-hint"></textarea></div>
+          </div>
+          <p class="hint" id="cut-hint">Use the same ID for the same cut. Leave the start and end off the list.</p>
+          <label for="approved">Approved retimes <span class="hint">(optional)</span></label>
+          <textarea id="approved" rows="2" spellcheck="false" autocapitalize="off" aria-describedby="approval-hint"></textarea>
+          <p class="hint" id="approval-hint">Use the source ID and exact approved new time. Added and removed cuts are always flagged.</p>
+          <label class="check"><input id="confirmed" type="checkbox"> I verified the source cuts and duration.</label>
+        </div>
+      </section>
+      <section class="card results" aria-labelledby="result-title">
+        <header class="card-head"><span class="step">02</span><div><h2 id="result-title">Cut review</h2><p>Compare the plan, not the pixels.</p></div></header>
+        <div class="result-body">
+          <p id="status" class="badge" aria-live="polite"></p>
+          <ul id="errors" hidden></ul>
+          <div id="timeline" aria-hidden="true"></div>
+          <div class="table-wrap" id="table-wrap" tabindex="0" role="region" aria-label="Scrollable cut comparison"><table><thead><tr><th scope="col">Cut</th><th scope="col">Source</th><th scope="col">Proposal</th><th scope="col">Result</th></tr></thead><tbody id="rows"></tbody></table></div>
+          <div class="controls"><button id="copy" type="button">Copy Markdown</button><button id="download" class="secondary" type="button">Download <span aria-hidden="true">↓</span></button></div>
+          <p id="output-note" class="hint" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+    <footer><span>No video, uploads, or accounts.</span><span>Only checks the supplied cut plan. It cannot verify generated footage.</span></footer>
+  </main>
+</body>
+</html>
