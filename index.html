@@ -35,6 +35,8 @@
           <textarea id="approved" rows="2" spellcheck="false" autocapitalize="off" aria-describedby="approval-hint"></textarea>
           <p class="hint" id="approval-hint">Use the source ID and exact approved new time. Added and removed cuts are always flagged.</p>
           <label class="check"><input id="confirmed" type="checkbox"> I verified the source cuts and duration.</label>
+          <p class="hint" aria-live="polite"><span id="approval-warning" hidden>Source changed. Existing retime approvals are not applied. Verify the new source, then review the retimes before approving them again.</span></p>
+          <button class="secondary" type="button" id="renew-approvals" hidden>Approve retimes for this source</button>
         </div>
       </section>
       <section class="card results" aria-labelledby="result-title">

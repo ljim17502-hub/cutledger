@@ -3,7 +3,8 @@
   const { compare, fmt, labels, markdown } = window.CutLedger;
   const el = id => document.getElementById(id);
   const keys = ["duration", "source", "proposed", "approved", "confirmed"];
-  let result;
+  let result, approvalsNeedReview = false;
+  const approvalsPaused = () => approvalsNeedReview && el("approved").value.trim() !== "";
   function node(tag, value, name) {
     const n = document.createElement(tag);
     if (value != null) n.textContent = value;
@@ -27,7 +28,12 @@
     }
   }
   function render() {
-    result = compare(Object.fromEntries(keys.map(k => [k, k === "confirmed" ? el(k).checked : el(k).value])));
+    const inputs = Object.fromEntries(keys.map(k => [k, k === "confirmed" ? el(k).checked : el(k).value]));
+    const paused = approvalsPaused();
+    el("approval-warning").hidden = !paused;
+    el("renew-approvals").hidden = !paused;
+    el("renew-approvals").disabled = !inputs.confirmed;
+    result = compare({ ...inputs, approved: paused ? "" : inputs.approved });
     const status = { invalid: "Fix the inputs to compare cuts", unverified: "Draft · source not verified",
       matched: "Cut plan matched", review: "Review needed · " + result.flags + " flagged" };
     if (el("status").textContent !== status[result.outcome]) el("status").textContent = status[result.outcome];
@@ -62,16 +68,31 @@
     el("proposed").value = "A 2.400\nB 6.000\nC 9.000";
     el("approved").value = "B 6.000";
     el("confirmed").checked = true;
+    approvalsNeedReview = false;
     render();
   }
   for (const k of keys) el(k).addEventListener("input", () => {
     el("sample-state").textContent = "Your inputs · not saved";
-    if (k === "source" || k === "duration") el("confirmed").checked = false;
+    if (k === "source" || k === "duration") {
+      if (el("approved").value.trim()) approvalsNeedReview = true;
+      el("confirmed").checked = false;
+    }
     render();
   });
   el("demo").addEventListener("click", demo);
+  el("renew-approvals").addEventListener("click", () => {
+    if (!approvalsPaused() || !el("confirmed").checked) return;
+    approvalsNeedReview = false;
+    el("approved").focus();
+    render();
+  });
+  function reportMarkdown() {
+    return markdown(result) + (approvalsPaused()
+      ? "\nExisting retime approvals were not applied. The source changed and those approvals have not been renewed.\n"
+      : "");
+  }
   el("copy").addEventListener("click", async () => {
-    const report = markdown(result);
+    const report = reportMarkdown();
     try {
       await navigator.clipboard.writeText(report);
       el("output-note").textContent = "Report copied.";
@@ -80,7 +101,7 @@
     }
   });
   el("download").addEventListener("click", () => {
-    const href = URL.createObjectURL(new Blob([markdown(result)], { type: "text/markdown;charset=utf-8" }));
+    const href = URL.createObjectURL(new Blob([reportMarkdown()], { type: "text/markdown;charset=utf-8" }));
     const a = document.createElement("a");
     a.href = href;
     a.download = "cutledger-review.md";
